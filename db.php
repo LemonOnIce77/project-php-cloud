@@ -6,11 +6,11 @@
  * - Jika menggunakan XAMPP lokal: default host '127.0.0.1', user 'root', pass ''
  * - Jika menggunakan Cloud Database (Aiven/Clever Cloud/dll): masukkan kredensial dari dashboard cloud Anda
  */
-define('DB_HOST', '127.0.0.1');       // Host database (misal: localhost, 127.0.0.1, atau host cloud)
+define('DB_HOST', 'db-tugas-emil.mysql.database.azure.com');       // Host database (misal: localhost, 127.0.0.1, atau host cloud)
 define('DB_PORT', '3306');            // Port MySQL (default: 3306)
 define('DB_NAME', 'db_landing_page'); // Nama database
-define('DB_USER', 'root');            // Username MySQL
-define('DB_PASS', '');                // Password MySQL (default XAMPP kosong)
+define('DB_USER', 'muhammadyaumiladitya');            // Username MySQL
+define('DB_PASS', 'Emiladitya2!');                // Password MySQL (default XAMPP kosong)
 
 // Variabel global untuk menyimpan pesan error koneksi jika gagal
 $db_error = null;
