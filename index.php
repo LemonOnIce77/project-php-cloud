@@ -59,6 +59,33 @@ $socials = [
     ]
 ];
 
+// Fallback Data Proyek
+$projects = [
+    [
+        'title'       => 'Sistem Informasi Cloud Monitoring',
+        'category'    => 'Cloud Computing',
+        'description' => 'Aplikasi pemantauan metrik server VM berbasis web dengan PHP dan visualisasi data realtime.',
+        'badge'       => 'PHP & Linux',
+        'link'        => '#'
+    ],
+    [
+        'title'       => 'Personal Landing Page Glassmorphism',
+        'category'    => 'Web Development',
+        'description' => 'Website personal modern berbasis PHP Native dengan integrasi MySQL, tema dinamis, dan responsif.',
+        'badge'       => 'PHP Native & MySQL',
+        'link'        => '#'
+    ]
+];
+
+// Fallback Data Pesan Masuk (Guestbook)
+$recentMessages = [
+    [
+        'sender_name' => 'Budi Santoso',
+        'message'     => 'Halo Mas Yaumil! Desain landing page-nya sangat keren dan responsif.',
+        'created_at'  => '2026-11-01 10:15:00'
+    ]
+];
+
 // Jika terhubung ke MySQL, ambil data dinamis dari tabel
 if ($dbConnected) {
     try {
@@ -82,6 +109,20 @@ if ($dbConnected) {
         if (!empty($dbSocials)) {
             $socials = $dbSocials;
         }
+
+        // Ambil Data Projects
+        $stmtProjects = $db->query("SELECT * FROM projects ORDER BY id ASC");
+        $dbProjects = $stmtProjects->fetchAll();
+        if (!empty($dbProjects)) {
+            $projects = $dbProjects;
+        }
+
+        // Ambil Data Pesan Masuk Terbaru (Maksimal 3 pesan terakhir)
+        $stmtMessages = $db->query("SELECT sender_name, message, created_at FROM contact_messages ORDER BY id DESC LIMIT 3");
+        $dbMessages = $stmtMessages->fetchAll();
+        if (!empty($dbMessages)) {
+            $recentMessages = $dbMessages;
+        }
     } catch (PDOException $e) {
         // Tabel mungkin belum dibuat, biarkan menggunakan data fallback
     }
@@ -91,7 +132,7 @@ if ($dbConnected) {
 $alertMessage = '';
 $alertType = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_message'])) {
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['send_message'])) {
     $senderName  = trim($_POST['name'] ?? '');
     $senderEmail = trim($_POST['email'] ?? '');
     $userMessage = trim($_POST['message'] ?? '');
@@ -513,6 +554,122 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_message'])) {
             transform: translateY(-2px);
         }
 
+        /* Projects Section */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .section-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+        }
+
+        .section-tag {
+            font-size: 0.75rem;
+            color: var(--accent-1);
+            background: var(--chip-bg);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .project-card {
+            background: rgba(0, 0, 0, 0.12);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 16px 18px;
+            transition: all 0.25s ease;
+        }
+
+        .project-card:hover {
+            border-color: var(--accent-1);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px var(--glow-color);
+        }
+
+        .project-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .project-title {
+            font-size: 0.98rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .project-badge {
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: var(--chip-bg);
+            color: var(--chip-text);
+            border: 1px solid var(--chip-border);
+        }
+
+        .project-desc {
+            font-size: 0.86rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* Recent Messages / Guestbook */
+        .messages-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 16px;
+            border-top: 1px dashed var(--card-border);
+            padding-top: 16px;
+        }
+
+        .message-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .message-name {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .message-date {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        .message-content {
+            font-size: 0.84rem;
+            color: var(--text-muted);
+            line-height: 1.45;
+        }
+
         /* Contact / Guestbook Form Section */
         .contact-box {
             background: rgba(0, 0, 0, 0.15);
@@ -699,10 +856,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_message'])) {
 
     <!-- Top Status Bar -->
     <div class="top-bar">
-        <div class="db-indicator <?= $dbConnected ? 'db-online' : 'db-offline'; ?>" title="<?= $dbConnected ? 'Terhubung ke Database MySQL' : 'Database belum terhubung (Menggunakan data fallback)'; ?>">
+        <a href="test_db.php" style="text-decoration: none;" class="db-indicator <?= $dbConnected ? 'db-online' : 'db-offline'; ?>" title="<?= $dbConnected ? 'Terhubung ke Database MySQL (Klik untuk detail)' : 'Database belum terhubung (Klik untuk cek solusi)'; ?>">
             <span class="db-dot"></span>
-            <?= $dbConnected ? 'MySQL Connected' : 'MySQL Offline (Fallback)'; ?>
-        </div>
+            <?= $dbConnected ? 'MySQL Connected' : 'MySQL Offline (Cek)'; ?>
+        </a>
         <button class="theme-toggle" id="themeToggle" aria-label="Ganti Tema">
             <svg id="themeIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -745,6 +902,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_message'])) {
         <div class="skills-grid">
             <?php foreach ($skills as $skill): ?>
                 <span class="skill-tag"><?= htmlspecialchars($skill); ?></span>
+            <?php endforeach; ?>
+        </div>
+
+        <!-- Projects Showcase from MySQL -->
+        <div class="section-header">
+            <div class="section-title">Proyek Unggulan (Data MySQL)</div>
+            <span class="section-tag"><?= count($projects); ?> Proyek</span>
+        </div>
+        <div class="projects-grid">
+            <?php foreach ($projects as $project): ?>
+                <div class="project-card">
+                    <div class="project-top">
+                        <span class="project-title"><?= htmlspecialchars($project['title']); ?></span>
+                        <span class="project-badge"><?= htmlspecialchars($project['badge'] ?? $project['category']); ?></span>
+                    </div>
+                    <p class="project-desc"><?= htmlspecialchars($project['description']); ?></p>
+                </div>
             <?php endforeach; ?>
         </div>
 
@@ -794,6 +968,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_message'])) {
                     Kirim Pesan ke Database
                 </button>
             </form>
+
+            <?php if (!empty($recentMessages)): ?>
+                <div class="messages-list">
+                    <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">
+                        📥 Pesan Masuk Terbaru</div>
+                    <?php foreach ($recentMessages as $msg): ?>
+                        <div class="message-card">
+                            <div class="message-header">
+                                <span class="message-name"><?= htmlspecialchars($msg['sender_name']); ?></span>
+                                <span class="message-date"><?= date('d M Y, H:i', strtotime($msg['created_at'])); ?></span>
+                            </div>
+                            <p class="message-content"><?= htmlspecialchars($msg['message']); ?></p>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </section>
 
         <!-- Social Media Links -->
